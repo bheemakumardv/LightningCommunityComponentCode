@@ -1,4 +1,4 @@
-***This component is ***
+***This component is designed and developed to have custom look and feel for the employee related list information***
 
 Component Code:
 --------------
