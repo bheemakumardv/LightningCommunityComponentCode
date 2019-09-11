@@ -1,3 +1,5 @@
+***This component is will redirect the employee on login to his own profile page where employee can create update his profile***
+
 Component Code:
 --------------
 
