@@ -1,5 +1,6 @@
+***This component is designed to have custom look and feel for the employee form details***
 Component Code:
-
+--------------
 <aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
     <lightning:card title="Employee Detail" iconName="standard:avatar" class= "header1">
         <aura:set attribute="actions">
@@ -75,7 +76,7 @@ Component Code:
 </aura:component>
 
 Controller Code:
-
+---------------
 ({
     closeModal:function(component,event,helper){    
         var cmpTarget = component.find('Modalbox');
