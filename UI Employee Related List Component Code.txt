@@ -1,0 +1,162 @@
+Component Code:
+--------------
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global"
+                controller="TeamRelatedObjects" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <aura:attribute name="EmailsList" type="Email__c[]" />   
+    <aura:attribute name="emailobj" type="Email__c" default="{'sobjectType':'Email__c'}"/>
+    <lightning:card title="Emails" iconName="standard:email_chatter" class= "header1" >
+        <aura:set attribute="actions">
+            <lightning:button variant="brand" iconName="utility:new" iconPosition="centre" label="New" onclick= "{!c.openmodal}"/>
+        </aura:set>
+        
+        
+        <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+        
+            <p class="slds-p-horizontal_small">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                    <thead> 
+                        <tr class="slds-text-title--caps">
+                            <th class="" scope="col">
+                                <div  title="EmailAddress">Email Address</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div  title="EmailType">Email Type</div>
+                            </th>
+                        </tr>            
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.EmailsList}" var="Emails">
+                            <tr class="slds-line-height_reset">                    
+                                <th scope="row" data-label="Email Address">{!Emails.Email_Address__c}</th> 
+                                <td scope="row" data-label="Email Type">{!Emails.Email_Type__c}</td> 
+                            </tr>
+                        </aura:iteration>
+                    </tbody>       
+                </table>  
+                <div role="dialog"  aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModal }" alternativeText="close" variant="bare-inverse" class="slds-modal__close"/>
+                            <h2 id="header43" class="slds-text-heading--medium">New Email</h2>
+                        </div>                    
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <div>
+                                <lightning:card iconName="standard:email_chatter" title="Emails" class="back">
+                                    <lightning:recordEditForm aura:id="form"  objectApiName="Email__c" onsuccess= "{!c.handleOnSuccess}" class="slds-card__body_inner">
+                                        <lightning:messages/>                                    
+                                        <lightning:inputField fieldName="Email_Address__c" value="{!v.emailobj.Email_Address__c}"/>  
+                                        <lightning:inputField fieldName="Email_Type__c" value="{!v.emailobj.Email_Type__c}"/>
+                                        <lightning:inputField fieldName="Team_Member_Profile__c" value="{!v.recordId}" />                                    
+                                        <div class="slds-m-top_medium" >
+                                            <lightning:button variant="brand" iconName="utility:save" iconPosition="center" label="Save" type="submit" onclick= "{!c.updatemodal}"/>
+                                            <lightning:button variant="brand" iconName="utility:cancel" iconPosition="center" label="Cancel" onclick= "{!c.closeModal}"/>                            
+                                        </div>                                   
+                                    </lightning:recordEditForm>
+                                </lightning:card>
+                            </div>
+                        </div>                   
+                        <div class="slds-modal__footer">                      
+                            <!--<div class="slds-m-top_medium" >
+                            <lightning:button variant="brand" iconName="utility:save" iconPosition="center" label="Save" type="submit" onclick= "{!c.updatemodal}"/>
+                            <lightning:button variant="brand" iconName="utility:cancel" iconPosition="center" label="Cancel" onclick= "{!c.closeModal}"/>                            
+                        </div>-->
+                        </div>                    
+                    </div>
+                </div> 
+                
+            </p>
+ 
+    </lightning:card>
+</aura:component>
+
+Java Controller Code:
+--------------------
+({
+    doInit : function(component, event, helper) {
+        debugger;
+        
+        var action =component.get('c.findEmailsByTeamMember');
+        action.setParams({
+            recid: component.get("v.recordId")
+        });
+        action.setCallback(this, function(response){
+            var responsevalue =response.getReturnValue(); 
+            console.log('responsevalue', responsevalue);
+            component.set('v.EmailsList', responsevalue); 
+        });        	
+        $A.enqueueAction(action);
+    },
+    
+    openmodal: function(component,event,helper) {
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.addClass(cmpTarget, 'slds-fade-in-open');
+        $A.util.addClass(cmpBack, 'slds-backdrop--open'); 
+    },
+    
+    closeModal:function(component,event,helper){    
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.removeClass(cmpBack,'slds-backdrop--open');
+        $A.util.removeClass(cmpTarget, 'slds-fade-in-open'); 
+    },
+    
+    updatemodal:function(component,event,helper){ 
+        debugger;
+        /*var emailaddress = component.get("v.emailobj.Email_Address__c");
+        var emailtype = component.get("v.emailobj.Email_Type__c"); 
+        var action =component.get('c.insertemail');
+        var teamMemberId =component.get('v.recordId');
+        action.setParams({
+            emailaddress:emailaddress,
+            emailtype:emailtype,
+            recid: component.get("v.recordId")            
+        });*/
+        
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.removeClass(cmpBack,'slds-backdrop--open');
+        $A.util.removeClass(cmpTarget, 'slds-fade-in-open');
+        //$A.get('e.force:refreshView').fire();
+        var action =component.get('c.findEmailsByTeamMember');
+        action.setParams({
+            recid: component.get("v.recordId")
+        });
+        action.setCallback(this, function(response){
+            var responsevalue =response.getReturnValue(); 
+            console.log('responsevalue', responsevalue);
+            component.set('v.EmailsList', responsevalue); 
+        });        	
+        $A.enqueueAction(action);       
+    }
+    
+})
+
+Apex Controller:
+---------------
+public class TeamRelatedObjects {
+    static  Email__c email ;
+    @AuraEnabled
+    public static List<Email__c> findEmailsByTeamMember(String recid) {
+        return [SELECT Email_Address__c, Email_Type__c,  Preferred__c FROM Email__c where Team_Member_Profile__c=:recid LIMIT 50];
+    } 
+    
+    @AuraEnabled
+    public static List<Phone__c> findPhonesByTeamMember(String recid) {
+        return [SELECT Phone_Number__c, Phone_Type__c, Primary_Contact__c  FROM Phone__c where Team_Member_Profile__c=:recid LIMIT 50];
+    }
+    
+    @AuraEnabled public static void insertemail(String emailaddress,String emailtype,String recid){
+        
+        email = new Email__c();
+        
+        email.Email_Address__c = emailaddress;
+        email.Email_Type__c = emailtype;
+        email.Team_Member_Profile__c = recid;
+        insert email;
+        system.debug('Inside Apex class insert method:' +email.id);
+        
+    }
+}

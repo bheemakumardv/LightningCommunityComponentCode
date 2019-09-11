@@ -1,0 +1,85 @@
+Component Code:
+--------------
+
+<aura:component controller="GetProfileId" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.GetProfileID}"/>
+    <aura:attribute name="responseStatus" type="Boolean" default="false" /> 
+    <aura:attribute name="profileUrl" type="String"/>
+    <aura:attribute name="firstName" type="String"/>
+    <aura:attribute name="lastName" type="String"/>
+    
+    <aura:if  isTrue="{!v.responseStatus}" >
+        <lightning:tile label="Update My Profile" href="{!v.profileUrl}">        
+            <aura:set attribute="media">
+                <lightning:avatar src="/docs/component-library/app/images/examples/avatar1.jpg" fallbackIconName="standard:person_account" alternativeText="Lexee L. Jackson"/>
+            </aura:set>
+            <ul class="slds-list_horizontal slds-has-dividers_right textdecorationnone">
+                <li class="slds-item">{!v.firstName}</li>
+                <li class="slds-item">{!v.lastName}</li>
+            </ul>
+        </lightning:tile>
+      <aura:set attribute="else">
+         <lightning:tile label="Create My Profile" href="{!v.profileUrl}">        
+            <aura:set attribute="media">
+                <lightning:avatar src="/docs/component-library/app/images/examples/avatar1.jpg" fallbackIconName="standard:person_account" alternativeText="Lexee L. Jackson"/>
+            </aura:set>            
+        </lightning:tile>
+      </aura:set>
+   </aura:if> 
+</aura:component>
+
+Java Controller Code:
+-------------------
+
+({
+    GetProfileID : function(component, event, helper) {
+        var state;
+        var redirectUrl;
+        var loggedInUser;        
+        var action = component.get("c.getLoggedInUser");
+        action.setCallback(this, function(response) {
+            state = response.getState();
+            if(state == "SUCCESS"){
+                loggedInUser = response.getReturnValue();                
+                /*redirectUrl = 'https://employcommunity-developer-edition.ap8.force.com/CustomerExperience/s/team-member-profile/'+ loggedInUser.Id +'/tm001';
+                component.set("v.profileUrl",redirectUrl);*/
+                redirectUrl = 'team-member-profile/'+ loggedInUser.Id;                
+                component.set("v.firstName",loggedInUser.First_Name__c);
+                component.set("v.lastName",loggedInUser.Last_Name__c);
+                component.set("v.responseStatus",true);
+            }else{
+                redirectUrl = 'team-member-profile/Team_Member_Profile__c/00B0o00000EVziREAT';
+                component.set("v.responseStatus",false);
+            }          
+            component.set("v.profileUrl",redirectUrl);
+        });
+        $A.enqueueAction(action);
+    }
+})
+
+Style:
+-----
+
+.THIS {
+}
+.THIS .slds-item{
+    margin-right:3px;
+}
+.THIS .slds-item::after{
+    display:none;
+}
+
+Apex Controller:
+---------------
+public class GetProfileId {
+	@AuraEnabled
+    public static Team_Member_Profile__c getLoggedInUser(){
+        System.debug('User Id: ' + UserInfo.getUserId());
+        System.debug('User Id: ' + UserInfo.getFirstName()); 
+        
+        return [SELECT Id,First_Name__c,Last_Name__c FROM Team_Member_Profile__c WHERE CreatedById =: UserInfo.getUserId() LIMIT 1];        
+    }
+}
+
+
+

@@ -1,0 +1,101 @@
+Component Code:
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <lightning:card title="Employee Detail" iconName="standard:avatar" class= "header1">
+        <aura:set attribute="actions">
+            <lightning:button variant="brand" iconName="utility:save" iconPosition="centre" label="Edit" onclick= "{!c.openmodal}"/>
+        </aura:set>
+        <p class="slds-p-horizontal_small">
+            <lightning:recordViewForm recaordId="{!v.recordId}" objectApiName="Team_Member_Profile__c">
+                <div>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "Name" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "First_Name__c" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "Middle_Name__c" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "Last_Name__c" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "Department__c" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "Grade__c" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "CreatedById" class= "design" value="{!v.today}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "LastModifiedById" class= "design"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <lightning:outputField fieldName= "OwnerId" class= "design"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>                
+            </lightning:recordViewForm>            
+            <!--<lightning:button variant="brand" iconName="utility:save" iconPosition="centre" label="Edit" onclick= "{!c.openmodal}"/>-->
+            <div role="dialog"  aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModal }" alternativeText="close" variant="bare-inverse" class="slds-modal__close"/>
+                        <h2 id="header43" class="slds-text-heading--medium">Edit Record</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div>
+                            <lightning:card iconName="standard:avatar" 
+                                            title="{! (v.recordId == null ? 'New ' : 'Edit') + 'Record Details' }" class="back">
+                                <lightning:recordEditForm aura:id="form" recordId="{!v.recordId}" objectApiName="Team_Member_Profile__c" onsuccess= "{!c.handleOnSuccess}" class="slds-card__body_inner">
+                                    <lightning:messages/>
+                                    <lightning:inputField fieldName="Name" disabled="true"/>
+                                    <lightning:inputField fieldName="First_Name__c" value="{!v.Team_Member_Profile__c.First_Name__c}" aura:id="Team_Member_Profile__c"/>
+                                    <lightning:inputField fieldName="Middle_Name__c" aura:id="Team_Member_Profile__c"/>
+                                    <lightning:inputField fieldName="Last_Name__c" aura:id="Team_Member_Profile__c"/>
+                                    <lightning:inputField fieldName="Department__c" aura:id="Team_Member_Profile__c"/>
+                                    <lightning:inputField fieldName="Grade__c" aura:id="Team_Member_Profile__c"/>
+                                    <div class="slds-m-top_medium">
+                                        <lightning:button variant="brand"  iconPosition="left" label="Save" type="submit" onclick= "{!c.updatemodal}"/>
+                                        <lightning:button variant="brand"  iconPosition="left" label="Cancel" onclick= "{!c.closeModal}"/>                            
+                                    </div>
+                                </lightning:recordEditForm>
+                            </lightning:card>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+        </p>        
+    </lightning:card>    
+</aura:component>
+
+Controller Code:
+
+({
+    closeModal:function(component,event,helper){    
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.removeClass(cmpBack,'slds-backdrop--open');
+        $A.util.removeClass(cmpTarget, 'slds-fade-in-open'); 
+    },    
+    
+    openmodal: function(component,event,helper) {
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.addClass(cmpTarget, 'slds-fade-in-open');
+        $A.util.addClass(cmpBack, 'slds-backdrop--open'); 
+    },
+    
+    updatemodal: function(component,event,helper) {
+        
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.removeClass(cmpBack,'slds-backdrop--open');
+        $A.util.removeClass(cmpTarget, 'slds-fade-in-open'); 
+    }    
+})
